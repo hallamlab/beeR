@@ -1,0 +1,78 @@
+---
+title: "Monica_Beta_Reg"
+author: "W. Evan Durno"
+date: '2015-10-14'
+output: html_document
+---
+
+```{r}
+# Load data 
+x = read.table("groups_ts4B_param.txt",header=T,sep="\t")
+y = read.table("groups_ts4B.txt",header=T,sep="\t")
+
+# Process data
+ykeys = paste( as.character(y[,1]) , as.character(y[,2]) )
+xkeys = paste( as.character(x[,2]) , as.character(x[,3]) )
+getId = function( str ){ for(i in 1:length(xkeys)){ if(str == xkeys[i]){return(i)} } }
+idx = sapply( ykeys , getId )
+x = x[idx,]
+x = data.frame( x$Oxygen , x$Methane , x$Nitrate , x$Nitrite , x$Hydrogen.Sulfide )
+J = 1:nrow(y)
+J1 = J[ as.character(y[,4]) == "F9P41000" ]
+J2 = J[ as.character(y[,4]) == "OPU1H2" ]
+J3 = J[ as.character(y[,4]) == "SHAN715" ]
+y1 = y[ J1 ,]
+x1 = x[ J1 ,]
+y2 = y[ J2 ,]
+x2 = x[ J2 ,]
+y3 = y[ J3 ,]
+x3 = x[ J3 ,]
+
+# remove NaN rows 
+J1 = (1:nrow(y1))[ rowSums(is.nan(as.matrix(x1))) == 0 ] 
+J2 = (1:nrow(y2))[ rowSums(is.nan(as.matrix(x2))) == 0 ] 
+J3 = (1:nrow(y3))[ rowSums(is.nan(as.matrix(x3))) == 0 ] 
+y1 = y1[J1,]
+x1 = x1[J1,]
+y2 = y2[J2,]
+x2 = x2[J2,]
+y3 = y3[J3,]
+x3 = x3[J3,]
+
+# Modularize 
+d1 = data.frame( y1$abundance , x1 )
+d2 = data.frame( y2$abundance , x2 )
+d3 = data.frame( y3$abundance , x3 )
+
+# Beta Regression 
+library(betareg)
+model1 = betareg( y1.abundance ~ . , d1 )
+model2 = betareg( y2.abundance ~ . , d2 )
+model3 = betareg( y3.abundance ~ . , d3 )
+model3.1 = betareg( y3.abundance ~ x.Hydrogen.Sulfide , d3 )
+summary(model1)
+summary(model2)
+summary(model3)
+summary(model3.1)
+
+# Logit regression 
+invlogit = function(x) -log( 1/x - 1 )
+d1l = d1 ; d1l$y1.abundance = invlogit(d1l$y1.abundance)
+d2l = d2 ; d2l$y2.abundance = invlogit(d2l$y2.abundance)
+d3l = d3 ; d3l$y3.abundance = invlogit(d3l$y3.abundance)
+logit_model1 = lm( y1.abundance ~ . , d1l ) 
+logit_model2 = lm( y2.abundance ~ . , d2l ) 
+logit_model3 = lm( y3.abundance ~ . , d3l ) 
+summary(logit_model1)
+summary(logit_model2)
+summary(logit_model3)
+
+# Plot hits & interests
+plot( d1$x.Methane , d1$y1.abundance , main="FP" ) 
+plot( d1$x.Nitrite , d1$y1.abundance , main="FP" ) 
+plot( d1$x.Hydrogen.Sulfide , d1$y1.abundance , main="FP" ) 
+plot( d3$x.Hydrogen.Sulfide , d3$y3.abundance , main="SH" ) 
+```
+
+
+
