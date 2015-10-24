@@ -14,9 +14,9 @@ Describe the experiment in detail here..
 read.csv() uploads the data directly as a data frame. The raw data is taken directly from the TECAN, although the temperature values and well IDs were removed in excel. Also, the well IDs we're replaced with the sample names. I printed the top of the file using head to see the structure of the file. 
 
 ```{r}
-GFP <- read.csv("C:/Users/Ho/Desktop/Rmd/RawData/2015_08_15_GFP.csv",
+GFP <- read.csv("2015_08_15_GFP.csv",
                 header=T, check.names=F) # Uploads the data with header. Check names ensures that the header numbers don't get replaced with characters. 
-OD <- read.csv("C:/Users/Ho/Desktop/Rmd/RawData/2015_08_15_OD.csv", 
+OD <- read.csv("2015_08_15_OD.csv", 
                header=T, check.names=F)
 print(GFP[1:5,1:5]) # prints the top of the GFP file
 ```
