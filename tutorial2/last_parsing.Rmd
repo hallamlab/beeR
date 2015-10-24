@@ -1,0 +1,23 @@
+---
+title: "last_table"
+author: "W. Evan Durno"
+date: '2015-10-23'
+output: html_document
+---
+
+```{r}
+# load data
+x = read.table("lastOut.tsv",header=F)
+
+# add column names
+colnames(x) = c("query","hit","percentID","aln_len","mis-match","gaps","query-start","query-end","hit-start","hit-end","e-value","bitscore")
+
+# subset data to have minimum percent ID of 99%
+y = x[ x$percentID >= 99 ,]
+
+# get some unique hits 
+u_queries = unique( x[ x$percentID >= 99 ,1] ) 
+
+# write to disk (write a file)
+write.table( u_queries , "unique_queries.txt" , sep="\t"  )
+```

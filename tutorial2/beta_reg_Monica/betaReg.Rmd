@@ -5,6 +5,12 @@ date: '2015-10-14'
 output: html_document
 ---
 
+### Header example
+
+Plain text
+
+$\sum_i^\infty$
+
 ```{r}
 # Load data 
 x = read.table("groups_ts4B_param.txt",header=T,sep="\t")
@@ -68,7 +74,9 @@ summary(logit_model2)
 summary(logit_model3)
 
 # Plot hits & interests
-plot( d1$x.Methane , d1$y1.abundance , main="FP" ) 
+library(graphics) #! 
+clrs = rainbow( nlevels( x$date ) ) #!
+plot( log(d1$x.Methane) , log(d1$y1.abundance) , main="Tequila bug" , ylab="log relative abundance" , xlab="log methane" , pch=16 , col=clrs[ as.numeric(x$date) ] ) #! 
 plot( d1$x.Nitrite , d1$y1.abundance , main="FP" ) 
 plot( d1$x.Hydrogen.Sulfide , d1$y1.abundance , main="FP" ) 
 plot( d3$x.Hydrogen.Sulfide , d3$y3.abundance , main="SH" ) 
