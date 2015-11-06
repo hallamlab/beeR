@@ -7,18 +7,45 @@ output: html_document
 
 ```{r}
 # Download & load EdgeR 
-source("http://bioconductor.org/biocLite.R")
-biocLite("edgeR")
+#source("http://bioconductor.org/biocLite.R")
+#biocLite("edgeR")
 library(edgeR)
 
 # Download & load DESeq 
-source("http://www.bioconductor.org/biocLite.R")
-biocLite("DESeq")
+#source("http://www.bioconductor.org/biocLite.R")
+#biocLite("DESeq")
 library(DESeq)
 
 # load data 
-y = read.csv("y.csv") 
+y = read.csv("y.csv",row.names=1) 
 x = read.table("design.tsv") 
+mve = as.character(x$slSampleType) 
+ls = c( rep("S",10) , rep("L",10) ) 
+strcut = function(str) substr( str , 1 , nchar(str)-1 ) 
+mve = strcut(mve) 
+xx = data.frame(ls,mve) 
 
-# Conduct a test 
+# Conduct a test with EdgeR 
+# EdgeR uses Likelihood Ratio Tests 
+# We will test for effects within MVE while controlling for LS 
+design = model.matrix(~ ls + mve , xx) 
+dge.glm <- DGEList(y, group=xx$ls) 
+dge.glm.com.disp <- estimateGLMCommonDisp(dge.glm,design, verbose=TRUE) 
+dge.glm.trend.disp <- estimateGLMTrendedDisp(dge.glm.com.disp, design) 
+dge.glm.tag.disp <- estimateGLMTagwiseDisp(dge.glm.trend.disp, design) 
+plotBCV(dge.glm.tag.disp) 
+fit <- glmFit(dge.glm.tag.disp,design) 
+lrt <- glmLRT(fit,coef=grep( "mve" ,colnames(design))) 
+topTags(lrt) 
+
+# Conduct a simpler test with DESeq (not DESeq2!) 
+# DESeq uses Wald tests 
+ls = as.factor(ls) 
+deSeqDat <- newCountDataSet(y, ls ) 
+deSeqDat <- estimateSizeFactors(deSeqDat) 
+deSeqDat <- estimateDispersions(deSeqDat) 
+plotDispEsts(deSeqDat) 
+results <- nbinomTest(deSeqDat, levels(ls)[1], levels(ls)[2]) 
+plotMA(results) 
+results[1:5,]
 ```
