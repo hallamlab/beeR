@@ -1,0 +1,24 @@
+---
+title: "RNASeq_Martha"
+author: "W. Evan Durno"
+date: '2015-11-06'
+output: html_document
+---
+
+```{r}
+# Download & load EdgeR 
+source("http://bioconductor.org/biocLite.R")
+biocLite("edgeR")
+library(edgeR)
+
+# Download & load DESeq 
+source("http://www.bioconductor.org/biocLite.R")
+biocLite("DESeq")
+library(DESeq)
+
+# load data 
+y = read.csv("y.csv") 
+x = read.table("design.tsv") 
+
+# Conduct a test 
+```
