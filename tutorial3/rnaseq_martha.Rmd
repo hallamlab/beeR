@@ -7,8 +7,8 @@ output: html_document
 
 ```{r}
 # Download & load EdgeR 
-#source("http://bioconductor.org/biocLite.R")
-#biocLite("edgeR")
+source("http://bioconductor.org/biocLite.R")
+biocLite("edgeR")
 library(edgeR)
 
 # Download & load DESeq 
@@ -48,4 +48,27 @@ plotDispEsts(deSeqDat)
 results <- nbinomTest(deSeqDat, levels(ls)[1], levels(ls)[2]) 
 plotMA(results) 
 results[1:5,]
+```
+
+```{r ggplot2}
+rnaseq_tbl <- read.table("y.csv", header=TRUE, sep=',')
+# Melt the wide table into a tidier looking table
+tidy_tbl <- melt(data = rnaseq_tbl, id.vars = "Locus.Tag")
+# let's rename our columns
+names(tidy_tbl) <- c("Locus.Tag", "sample", "rpkm")
+
+#ggplot works in layers
+#call gg plot, give it the data you want
+# aes is aesthetics vector - what data do you want to assign to your x-axis (in this case our sample names), y axis is y variable (here take the log of her data)
+# here we use a boxplot, but can call any geom plot function in there (box, scatter, etc)
+scat_plot <- ggplot(tidy_tbl, aes(x=sample, y= log(x = rpkm, base=10))) +
+  geom_boxplot() +
+  ylab("Log_10 RPKM") +
+  xlab("Samples") +
+  ggtitle("Example Box Plot for Martha's data") +
+  theme(axis.text.x = element_text(angle=45, hjust = 1, vjust = 1))
+scat_plot
+
+
+
 ```
